@@ -1,0 +1,28 @@
+<div class="addon-section" id="addon-wikipedia-{{cityId}}">
+  <h3>Wikipedia</h3>
+  <div id="wikipedia-{{cityId}}">Caricamento dati da Wikipedia...</div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    var url = "https://it.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exintro=true&explaintext=true&format=json&titles=" +
+              encodeURIComponent(city) + "&pithumbsize=500&origin=*";
+    fetch(url)
+      .then(function(response){ return response.json(); })
+      .then(function(data){
+         var pages = data.query.pages;
+         var pageId = Object.keys(pages)[0];
+         if(pageId === "-1"){
+           document.getElementById("wikipedia-" + cid).innerText = "Nessun dato trovato.";
+           return;
+         }
+         var page = pages[pageId];
+         var extract = page.extract || "Descrizione non disponibile.";
+         var thumb = page.thumbnail ? '<img src="' + page.thumbnail.source + '" alt="Immagine di ' + city + '">' : "";
+         document.getElementById("wikipedia-" + cid).innerHTML = thumb + "<p>" + extract + "</p>";
+      })
+      .catch(function(err){
+         document.getElementById("wikipedia-" + cid).innerText = "Errore: " + err.message;
+      });
+  })("{{city}}");
+</script>

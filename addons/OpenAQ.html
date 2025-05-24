@@ -1,0 +1,39 @@
+<div class="addon-section" id="addon-openAQ-{{cityId}}">
+  <h3>OpenAQ</h3>
+  <div id="openaq-{{cityId}}">Caricamento dati qualità aria...</div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(city))
+      .then(function(response){ return response.json(); })
+      .then(function(coordData){
+        if(coordData.length > 0){
+          var lat = parseFloat(coordData[0].lat),
+              lon = parseFloat(coordData[0].lon);
+          var aqUrl = "https://api.openaq.org/v2/latest?coordinates=" + lat + "," + lon + "&radius=50000&limit=1";
+          return fetch(aqUrl);
+        } else {
+          throw new Error("Coordinate non trovate.");
+        }
+      })
+      .then(function(response){ return response.json(); })
+      .then(function(aqData){
+         var measurements = (aqData.results && aqData.results.length > 0) ? aqData.results[0].measurements : [];
+         var html = "<ul>";
+         if(measurements.length > 0){
+           measurements.forEach(function(m){
+             html += "<li><strong>" + m.parameter + ":</strong> " + m.value + " " + m.unit +
+                     " (aggiornato: " + new Date(m.lastUpdated).toLocaleString() + ")</li>";
+           });
+         } else {
+           html += "Nessun dato disponibile.";
+         }
+         html += "</ul>";
+         document.getElementById("openaq-" + cid).innerHTML = html;
+      })
+      .catch(function(err){
+         document.getElementById("openaq-" + cid).innerText = "Errore: " + err.message;
+      });
+  })("{{city}}");
+</script>

@@ -1,0 +1,52 @@
+<div class="addon-section" id="addon-OpenMeteo-{{cityId}}">
+  <h3>Open‑Meteo</h3>
+  <div id="meteo-{{cityId}}">Caricamento meteo...</div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    function getWeather(lat, lon) {
+      var meteoUrl = "https://api.open-meteo.com/v1/forecast?latitude=" + lat +
+                     "&longitude=" + lon + "&current_weather=true&timezone=auto";
+      return fetch(meteoUrl).then(function(response){
+        if(!response.ok) throw new Error("HTTP error " + response.status);
+        return response.json();
+      });
+    }
+    if(window.globalCoordinates) {
+      getWeather(window.globalCoordinates.lat, window.globalCoordinates.lon)
+        .then(function(meteoData){
+          var cw = meteoData.current_weather;
+          document.getElementById("meteo-" + cid).innerHTML =
+            "<p><strong>Temperatura:</strong> " + cw.temperature + "°C</p>" +
+            "<p><strong>Vento:</strong> " + cw.windspeed + " km/h (" + cw.winddirection + "°)</p>" +
+            "<p><strong>Orario:</strong> " + cw.time + "</p>";
+        })
+        .catch(function(err){
+          document.getElementById("meteo-" + cid).innerText = "Errore: " + err.message;
+        });
+    } else {
+      fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(city))
+        .then(function(response){ return response.json(); })
+        .then(function(data){
+          if(data.length > 0){
+            var lat = parseFloat(data[0].lat),
+                lon = parseFloat(data[0].lon);
+            return getWeather(lat, lon);
+          } else {
+            throw new Error("Coordinate non trovate.");
+          }
+        })
+        .then(function(meteoData){
+          var cw = meteoData.current_weather;
+          document.getElementById("meteo-" + cid).innerHTML =
+            "<p><strong>Temperatura:</strong> " + cw.temperature + "°C</p>" +
+            "<p><strong>Vento:</strong> " + cw.windspeed + " km/h (" + cw.winddirection + "°)</p>" +
+            "<p><strong>Orario:</strong> " + cw.time + "</p>";
+        })
+        .catch(function(err){
+          document.getElementById("meteo-" + cid).innerText = "Errore: " + err.message;
+        });
+    }
+  })("{{city}}");
+</script>

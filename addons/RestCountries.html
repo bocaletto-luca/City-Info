@@ -1,0 +1,32 @@
+<div class="addon-section" id="addon-RestCountries-{{cityId}}">
+  <h3>Rest Countries</h3>
+  <div id="restcountries-{{cityId}}">Caricamento dati nazionali...</div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    // Per questo esempio, si usa "Italia" come paese; in futuro si potrebbe dedurre dal risultato di geocodifica.
+    var country = "Italia";
+    fetch("https://restcountries.com/v3.1/name/" + encodeURIComponent(country))
+      .then(function(response){
+         if(!response.ok) throw new Error("HTTP error " + response.status);
+         return response.json();
+      })
+      .then(function(data){
+         if(data && data.length > 0){
+           var cdata = data[0];
+           var html = "<p><strong>Nazione:</strong> " + cdata.name.common + "</p>" +
+                      "<p><strong>Capitale:</strong> " + (cdata.capital ? cdata.capital.join(", ") : "Non disponibile") + "</p>" +
+                      "<p><strong>Popolazione:</strong> " + cdata.population.toLocaleString() + "</p>" +
+                      "<p><strong>Regione:</strong> " + cdata.region + "</p>" +
+                      "<p><strong>Superficie:</strong> " + cdata.area + " km²</p>";
+           document.getElementById("restcountries-" + cid).innerHTML = html;
+         } else {
+           document.getElementById("restcountries-" + cid).innerText = "Dati non disponibili.";
+         }
+      })
+      .catch(function(err){
+         document.getElementById("restcountries-" + cid).innerText = "Errore: " + err.message;
+      });
+  })("{{city}}");
+</script>

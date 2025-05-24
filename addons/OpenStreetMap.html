@@ -1,0 +1,36 @@
+<div class="addon-section" id="addon-openStreetMap-{{cityId}}">
+  <h3>OpenStreetMap</h3>
+  <div id="osm-map-{{cityId}}" style="height:300px;">Caricamento mappa...</div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    function initMap(lat, lon) {
+      var map = L.map("osm-map-" + cid).setView([lat, lon], 13);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors"
+      }).addTo(map);
+      L.marker([lat, lon]).addTo(map)
+        .bindPopup("<strong>" + city + "</strong>")
+        .openPopup();
+    }
+    if(window.globalCoordinates){
+      initMap(window.globalCoordinates.lat, window.globalCoordinates.lon);
+    } else {
+      fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(city))
+        .then(function(response){ return response.json(); })
+        .then(function(data) {
+          if(data && data.length > 0){
+            var lat = parseFloat(data[0].lat),
+                lon = parseFloat(data[0].lon);
+            initMap(lat, lon);
+          } else {
+            document.getElementById("osm-map-" + cid).innerText = "Coordinate non trovate.";
+          }
+        })
+        .catch(function(err){
+          document.getElementById("osm-map-" + cid).innerText = "Errore nella mappa: " + err.message;
+        });
+    }
+  })("{{city}}");
+</script>

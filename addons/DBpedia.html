@@ -1,0 +1,36 @@
+<div class="addon-section" id="addon-dbpedia-{{cityId}}">
+  <h3>DBpedia</h3>
+  <div id="dbpedia-{{cityId}}">Caricamento dati da DBpedia...</div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    // Sostituisci eventuali spazi con underscore, come DA DBpedia richiede
+    var cityForQuery = city.replace(/\s+/g, "_");
+    var query = `
+      PREFIX dbo: <http://dbpedia.org/ontology/>
+      PREFIX dbr: <http://dbpedia.org/resource/>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      SELECT ?abstract WHERE {
+        dbr:${cityForQuery} dbo:abstract ?abstract.
+        FILTER (langMatches(lang(?abstract), "IT"))
+      }
+      LIMIT 1
+    `;
+    var url = "https://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&format=json&query=" + encodeURIComponent(query);
+    fetch(url)
+      .then(function(response){ return response.json(); })
+      .then(function(data){
+        var html = "";
+        if(data.results.bindings.length > 0){
+          html = "<p>" + data.results.bindings[0].abstract.value + "</p>";
+        } else {
+          html = "Nessun dato disponibile.";
+        }
+        document.getElementById("dbpedia-" + cid).innerHTML = html;
+      })
+      .catch(function(err){
+        document.getElementById("dbpedia-" + cid).innerText = "Errore: " + err.message;
+      });
+  })("{{city}}");
+</script>

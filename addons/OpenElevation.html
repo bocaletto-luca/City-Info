@@ -1,0 +1,55 @@
+<div class="addon-section" id="addon-OpenElevation-{{cityId}}">
+  <h3>Open Elevation</h3>
+  <div id="elevation-{{cityId}}">Caricamento altitudine...</div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    function getElevation(lat, lon) {
+      var elevUrl = "https://api.open-elevation.com/api/v1/lookup?locations=" + lat + "," + lon;
+      return fetch(elevUrl).then(function(response){
+        if(!response.ok) throw new Error("HTTP error " + response.status);
+        return response.json();
+      });
+    }
+    if(window.globalCoordinates) {
+      getElevation(window.globalCoordinates.lat, window.globalCoordinates.lon)
+        .then(function(elevData){
+          if(elevData.results && elevData.results.length > 0){
+            var elevation = elevData.results[0].elevation;
+            document.getElementById("elevation-" + cid).innerHTML =
+              "<p><strong>Altitudine:</strong> " + elevation + " m</p>";
+          } else {
+            document.getElementById("elevation-" + cid).innerText = "Dati altimetrici non disponibili.";
+          }
+        })
+        .catch(function(err){
+          document.getElementById("elevation-" + cid).innerText = "Errore: " + err.message;
+        });
+    } else {
+      fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(city))
+        .then(function(response){ return response.json(); })
+        .then(function(data){
+          if(data.length > 0){
+            var lat = parseFloat(data[0].lat),
+                lon = parseFloat(data[0].lon);
+            return getElevation(lat, lon);
+          } else {
+            throw new Error("Coordinate non trovate.");
+          }
+        })
+        .then(function(elevData){
+          if(elevData.results && elevData.results.length > 0){
+            var elevation = elevData.results[0].elevation;
+            document.getElementById("elevation-" + cid).innerHTML =
+              "<p><strong>Altitudine:</strong> " + elevation + " m</p>";
+          } else {
+            document.getElementById("elevation-" + cid).innerText = "Dati altimetrici non disponibili.";
+          }
+        })
+        .catch(function(err){
+          document.getElementById("elevation-" + cid).innerText = "Errore: " + err.message;
+        });
+    }
+  })("{{city}}");
+</script>

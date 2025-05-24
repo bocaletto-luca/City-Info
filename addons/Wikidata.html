@@ -1,0 +1,54 @@
+<div class="addon-section" id="addon-wikidata-{{cityId}}">
+  <h3>Wikidata/SPARQL</h3>
+  <div id="wikidata-{{cityId}}">Caricamento dati storici...</div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    var query = `
+      SELECT ?founded ?population ?area WHERE {
+        ?city rdfs:label ?label.
+        FILTER(regex(str(?label), "^${city}$", "i")).
+        OPTIONAL { ?city wdt:P571 ?founded. }
+        OPTIONAL { ?city wdt:P1082 ?population. }
+        OPTIONAL { ?city wdt:P2046 ?area. }
+      }
+      LIMIT 1
+    `;
+    var url = "https://query.wikidata.org/sparql?format=json&origin=*&query=" + encodeURIComponent(query);
+    fetch(url)
+      .then(function(response){ return response.json(); })
+      .then(function(data){
+        var result = data.results.bindings[0];
+        var html = "";
+        if(result){
+          // Anno di Fondazione
+          if(result.founded){
+            var founded = result.founded.value;
+            var parsedYear = new Date(founded).getFullYear();
+            html += "<p><strong>Anno di Fondazione:</strong> " + (isNaN(parsedYear) ? founded : (parsedYear <= 0 ? Math.abs(parsedYear) + " a.C." : parsedYear)) + "</p>";
+          } else {
+            html += "<p><strong>Anno di Fondazione:</strong> Non disponibile</p>";
+          }
+          // Popolazione
+          if(result.population){
+            html += "<p><strong>Popolazione:</strong> " + result.population.value + "</p>";
+          } else {
+            html += "<p><strong>Popolazione:</strong> Non disponibile</p>";
+          }
+          // Superficie (unità in genere m²)
+          if(result.area){
+            html += "<p><strong>Superficie:</strong> " + result.area.value + " m²</p>";
+          } else {
+            html += "<p><strong>Superficie:</strong> Non disponibile</p>";
+          }
+        } else {
+          html = "Nessun dato trovato.";
+        }
+        document.getElementById("wikidata-" + cid).innerHTML = html;
+      })
+      .catch(function(err){
+        document.getElementById("wikidata-" + cid).innerText = "Errore: " + err.message;
+      });
+  })("{{city}}");
+</script>

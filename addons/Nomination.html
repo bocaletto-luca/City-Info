@@ -1,0 +1,24 @@
+<div class="addon-section" id="addon-nominatim-{{cityId}}">
+  <h3>Nominatim</h3>
+  <div id="nominatim-results-{{cityId}}">
+    Caricamento dati di geocodifica per <strong>{{city}}</strong>...
+  </div>
+</div>
+<script>
+  (function(city){
+    var cid = city.trim().toLowerCase().replace(/\s+/g, "-");
+    fetch("https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&q=" + encodeURIComponent(city))
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        if(data.length > 0){
+          document.getElementById("nominatim-results-" + cid).innerHTML =
+            "<pre>" + JSON.stringify(data[0], null, 2) + "</pre>";
+        } else {
+          document.getElementById("nominatim-results-" + cid).innerText = "Nessun risultato trovato.";
+        }
+      })
+      .catch(function(err) {
+        document.getElementById("nominatim-results-" + cid).innerText = "Errore: " + err.message;
+      });
+  })("{{city}}");
+</script>
