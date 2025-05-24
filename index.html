@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>City Info Dashboard - Sistema Modulabile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Risorse globali: stili e librerie -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 20px;
+    }
+    header {
+      background-color: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      margin: 0;
+    }
+    p.description {
+      font-style: italic;
+      margin-bottom: 10px;
+      color: #444;
+    }
+    section {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+    }
+    .addon-section {
+      background: #e7f3fe;
+      border: 1px solid #8ac4f3;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .checkboxes label {
+      margin-right: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header con titolo, descrizione ed input -->
+  <header>
+    <h1>City Info Dashboard</h1>
+    <p class="description">
+      Questa dashboard modula l’accesso a varie API gratuite per mostrare informazioni su una città.
+      Inserisci il nome della città e clicca “Cerca”. Tutti i moduli sono attivati di default.
+    </p>
+    <input type="text" id="cityInput" placeholder="Inserisci il nome della città" value="Roma">
+    <button id="searchBtn">Cerca</button>
+  </header>
+  
+  <!-- Sezione delle checkbox per gli addon (tutti abilitati di default) -->
+  <section id="addonsSection">
+    <h2>Seleziona Addons</h2>
+    <div class="checkboxes">
+      <label><input type="checkbox" value="OpenStreetMap" class="addonCheckbox" checked> OpenStreetMap</label>
+      <label><input type="checkbox" value="Nomination" class="addonCheckbox" checked> Nomination</label>
+      <label><input type="checkbox" value="OpenMeteo" class="addonCheckbox" checked> Open‑Meteo</label>
+      <label><input type="checkbox" value="OpenElevation" class="addonCheckbox" checked> Open Elevation</label>
+      <label><input type="checkbox" value="RestCountries" class="addonCheckbox" checked> Rest Countries</label>
+      <label><input type="checkbox" value="Wikidata" class="addonCheckbox" checked> Wikidata</label>
+      <label><input type="checkbox" value="OpenAQ" class="addonCheckbox" checked> OpenAQ</label>
+      <label><input type="checkbox" value="SunriseSunset" class="addonCheckbox" checked> Sunrise‑Sunset</label>
+      <label><input type="checkbox" value="Wikipedia" class="addonCheckbox" checked> Wikipedia</label>
+      <label><input type="checkbox" value="DBpedia" class="addonCheckbox" checked> DBpedia</label>
+    </div>
+    <button id="updateAddons">Aggiorna Addons</button>
+  </section>
+  
+  <!-- Contenitore dove verranno iniettati dinamicamente gli addon -->
+  <section id="resultsContainer">
+  </section>
+  
+  <!-- Inclusione delle librerie globali -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Includiamo il file script.js con tutta la logica -->
+  <script src="script.js"></script>
+</body>
+</html>
