@@ -9,7 +9,7 @@
 
 ## Overview
 
-**ta City Info WebApp** is a comprehensive, browser‑based application that provides detailed information about cities using a wide range of free APIs. View interactive maps via OpenStreetMap, get real‑time weather from Open‑Meteo, check elevation with Open Elevation, access country data from Rest Countries, and discover related facts from Wikidata, OpenAQ, Sunrise‑Sunset, Wikipedia, and DBpedia. Whether you’re curious about local weather, geography, or cultural data, ta City Info brings it all to your fingertips.
+**City Info WebApp** is a comprehensive, browser‑based application that provides detailed information about cities using a wide range of free APIs. View interactive maps via OpenStreetMap, get real‑time weather from Open‑Meteo, check elevation with Open Elevation, access country data from Rest Countries, and discover related facts from Wikidata, OpenAQ, Sunrise‑Sunset, Wikipedia, and DBpedia. Whether you’re curious about local weather, geography, or cultural data, ta City Info brings it all to your fingertips.
 
 ## Installation
 
